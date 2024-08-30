@@ -1,0 +1,92 @@
+pipeline {
+    // add that node in jenkins node and assign it's public IP
+    agent { label 'ec2_CI' }
+
+    environment {
+        main_user = 'your user'
+        dev_IP = 'development public IP'
+        prod_IP = 'production public IP'
+    }
+
+    stages {
+
+        stage('CI Stages') {
+            when { branch 'dev' }
+
+            stages {
+
+                stage('Linting') {
+                    steps {
+                        echo 'Running Checkstyle...'
+                            sh  'chmod +x ./gradlew'
+                            sh './gradlew checkstyleMain checkstyleTest' }
+                }
+
+                stage('Testing') {
+                    steps {
+                        echo 'Running unit tests...'
+                        sh './gradlew  test' }
+                }
+
+                stage('Dockerizing') {
+                    steps {
+                       
+                        sh """
+                             docker login -u "${Docker_ID}" -p "${Docker_Pass}"
+                             docker build -t java-spring-boot:v"${BUILD_NUMBER}" -t java-spring-boot:latest  .
+                             docker tag java-spring-boot:v"${BUILD_NUMBER}" ahmedashraf15/java-spring-boot:v"${BUILD_NUMBER}"
+                             docker tag java-spring-boot:latest ahmedashraf15/java-spring-boot:latest
+                             docker push ahmedashraf15/java-spring-boot:v"${BUILD_NUMBER}"
+                             docker push ahmedashraf15/java-spring-boot:latest
+                            """
+                }}
+                }
+            }
+
+        //----------------------------------------------------------------------------------//
+
+        stage('CD Stage in Dev Env') {
+                stages {
+                    stage('Deploy on Env EC2') {
+                        steps {
+                            script {
+                            sshagent(['aws_private_key']) {
+                                sh '''
+                            ssh -o StrictHostKeyChecking=no ${main_user}@${dev_IP} 'mkdir -p ~/spring-boot-app'
+                            scp ./docker-compose.yml ${main_user}@${dev_IP}:~/spring-boot-app
+                            ssh ${main_user}@${dev_IP} 'docker info | grep -q "Swarm: active" || docker swarm init'
+                            ssh ${main_user}@${dev_IP} 'docker stack deploy -c ~/spring-boot-app/docker-compose.yml spring-app'
+
+                        '''
+                            }
+                            }
+                        }
+                    }
+                }
+        }
+
+        //----------------------------------------------------------------------------------//
+    stage('CD Stage in Production') {
+            when {
+                branch 'main'
+            }
+
+                stages {
+                    stage('Deploy on EC2') {
+                        steps {
+                        script {
+                            sshagent(['aws_private_key']) {
+                                sh '''
+                            ssh -o StrictHostKeyChecking=no ${main_user}@${prod_IP} 'mkdir -p ~/spring-boot-app'
+                            scp ./Docker-compose.yml ${main_user}@${prod_IP}:~/spring-boot-app
+                            ssh ${main_user}@${prod_IP} 'docker swarm init'
+                            ssh ${main_user}@${prod_IP} 'docker stack deploy --compose-file ~/spring-boot-app/Docker-compose.yml spring-app'
+
+                        '''
+                            }
+                        }
+                    }}
+                    }
+                }
+  }
+        }
