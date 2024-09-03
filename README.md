@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project shows how to build a Continuous Integration (CI) and Continuous Delivery (CD) pipeline with Jenkins and GitHub repository .
+This project shows how to build a project using DevOps Tools (git,ansible,jenkins,docker,docker compose,docker swarm)
 
 ## Prerequisites
 
@@ -25,6 +25,9 @@ This project shows how to build a Continuous Integration (CI) and Continuous Del
 ```
 docker build -t java-spring-boot .
 ```
+
+![Screenshot](imgs/Building.png)
+
 - run container from downloaded image
 
 ```
