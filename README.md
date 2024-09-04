@@ -29,6 +29,22 @@ ansible-playbook java_docker.yaml
 > [!NOTE]
 > You have to add your servers IP in inventory file
 
+
+## Setting Up Pipeline
+
+### CI Stages
+
+- include 3 main stages
+
+. Linting Stage
+. Unit Testing Stage
+. Dockerizing Stage
+
+### CD Stage
+
+- Deploy that final result to Dev Enviroment in AWS
+- After Approving APP Deployed to Prod Enviroment in AWS
+
 ## Building and Testing
 
 - Building image from Dockerfile
