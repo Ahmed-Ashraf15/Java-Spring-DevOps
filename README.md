@@ -75,4 +75,4 @@ docker stack services spring-app
 ```
 docker stack ps spring-app
 ```
-![Screenshot](imgs/stack_ps.png.png)
+![Screenshot](imgs/stack_ps.png)
