@@ -18,6 +18,17 @@ This project shows how to build a project using DevOps Tools (git,ansible,jenkin
 
 ![Screenshot](imgs/Arch.png)
 
+## installing dependencies
+
+- Using Ansible Playbook to install JDK and Docker
+
+```
+ansible-playbook java_docker.yaml
+```
+
+> [!NOTE]
+> You have to add your servers IP in inventory file
+
 ## Building and Testing
 
 - Building image from Dockerfile
