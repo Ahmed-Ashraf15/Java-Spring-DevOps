@@ -36,9 +36,9 @@ ansible-playbook java_docker.yaml
 
 - include 3 main stages
 
-. Linting Stage
-. Unit Testing Stage
-. Dockerizing Stage
+1. Linting Stage
+2. Unit Testing Stage
+3. Dockerizing Stage
 
 ### CD Stage
 
